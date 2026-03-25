@@ -1,187 +1,194 @@
-# **Frequently Asked Questions: Agentic Design Patterns**
+# Часто задаваемые вопросы: Паттерны проектирования агентных систем
 
-## 1. What is an "agentic design pattern"?
+## 1. Что такое "агентный паттерн проектирования"?
 
-An agentic design pattern is a reusable, high-level solution to a common problem encountered when building intelligent, autonomous systems (agents). These patterns provide a structured framework for designing agent behaviors, much like software design patterns do for traditional programming. They help developers build more robust, predictable, and effective AI agents.
+Агентный паттерн проектирования — это повторно используемое высокоуровневое решение распространённой проблемы, возникающей при создании интеллектуальных автономных систем (агентов). Эти паттерны предоставляют структурированный фреймворк для проектирования поведения агентов, аналогично тому, как паттерны проектирования ПО работают для традиционного программирования. Они помогают разработчикам создавать более надёжные, предсказуемые и эффективные AI-агенты.
 
-## 2. What is the main goal of this guide?
+## 2. Какова основная цель этого руководства?
 
-The guide aims to provide a practical, hands-on introduction to designing and building agentic systems. It moves beyond theoretical discussions to offer concrete architectural blueprints that developers can use to create agents capable of complex, goal-oriented behavior in a reliable way.
+Руководство aims предоставить practical, hands-on введение в проектирование и создание agentic систем. Оно выходит за рамки теоретических обсуждений, предлагая конкретные архитектурные blueprints, которые разработчики могут использовать для создания агентов, capable сложного, goal-oriented поведения надёжным способом.
 
-## 3. Who is the intended audience for this guide?
+## 3. Для кого предназначено это руководство?
 
-This guide is written for AI developers, software engineers, and system architects who are building applications with large language models (LLMs) and other AI components. It is for those who want to move from simple prompt-response interactions to creating sophisticated, autonomous agents.
+Это руководство написано для AI-разработчиков, software engineers и system architects, которые строят приложения с large language models (LLM) и другими AI компонентами. Оно для тех, кто хочет перейти от простых prompt-response взаимодействий к созданию сложных автономных агентов.
 
-## 4. What are some of the key agentic patterns discussed?
+## 4. Какие ключевые агентные паттерны обсуждаются?
 
-Based on the table of contents, the guide covers several key patterns, including:
+Согласно оглавлению, руководство covers several ключевых паттернов, включая:
 
-- **Reflection:** The ability of an agent to critique its own actions and outputs to improve performance.  
-- **Planning:** The process of breaking down a complex goal into smaller, manageable steps or tasks.  
-- **Tool Use:** The pattern of an agent utilizing external tools (like code interpreters, search engines, or other APIs) to acquire information or perform actions it cannot do on its own.  
-- **Multi-Agent Collaboration:** The architecture for having multiple specialized agents work together to solve a problem, often involving a "leader" or "orchestrator" agent.  
-- **Human-in-the-Loop:** The integration of human oversight and intervention, allowing for feedback, correction, and approval of an agent's actions.
+- **Reflection:** Способность агента критиковать свои собственные действия и выводы для улучшения производительности.
+- **Planning:** Процесс декомпозиции сложной цели на smaller, manageable шаги или задачи.
+- **Tool Use:** Паттерн использования агентом внешних инструментов (such as code интерпретаторы, поисковые системы или другие API) для получения информации или выполнения действий, которые он не может сделать сам.
+- **Multi-Agent Collaboration:** Архитектура для совместной работы multiple специализированных агентов для решения проблемы, often involving "leader" или "orchestrator" агента.
+- **Human-in-the-Loop:** Интеграция human oversight и intervention, allowing feedback, коррекцию и одобрение действий агента.
 
-## 5. Why is "planning" an important pattern
+## 5. Почему "планирование" — важный паттерн?
 
-Planning is crucial because it allows an agent to tackle complex, multi-step tasks that cannot be solved with a single action. By creating a plan, the agent can maintain a coherent strategy, track its progress, and handle errors or unexpected obstacles in a structured manner. This prevents the agent from getting "stuck" or deviating from the user's ultimate goal.
+Планирование crucial, because оно allowing агенту tackling сложные, multi-step задачи, которые не могут быть solved с single action. Создавая план, агент может maintaining coherent стратегию, tracking свой progress и handling ошибки или unexpected obstacles structured образом. Это preventing агента от getting "stuck" или deviating от конечной цели пользователя.
 
-## 6. What is the difference between a "tool" and a "skill" for an agent
 
-While the terms are often used interchangeably, a "tool" generally refers to an external resource the agent can call upon (e.g., a weather API, a calculator). A "skill" is a more integrated capability that the agent has learned, often combining tool use with internal reasoning to perform a specific function (e.g., the skill of "booking a flight" might involve using calendar and airline APIs).
+## 6. В чём разница между "инструментом" и "навыком" для агента?
 
-## 7. How does the "Reflection" pattern improve an agent's performance
+Хотя термины often используются interchangeably, "tool" generally refers к external ресурсу, который агент может использовать (например, weather API, calculator). "Skill" — это более integrated capability, которую агент learned, often combining tool use с internal reasoning для performing конкретной функции (например, skill "booking flight" might включать использование calendar и airline API).
 
-Reflection acts as a form of self-correction. After generating a response or completing a task, the agent can be prompted to review its work, check for errors, assess its quality against certain criteria, or consider alternative approaches. This iterative refinement process helps the agent produce more accurate, relevant, and high-quality results.
+## 7. Как паттерн "Reflection" улучшает производительность агента?
 
-## 8. What is the core idea of the Reflection pattern
+Reflection acts как форма self-correction. После генерации ответа или completing задачи, агент может быть prompted к review своей работы, checking на ошибки, assessing качество по certain criteria, или considering alternative подходы. Этот iterative refinement process helping агенту producing более accurate, relevant и high-quality результаты.
 
-The Reflection pattern gives an agent the ability to step back and critique its own work. Instead of producing a final output in one go, the agent generates a draft and then "reflects" on it, identifying flaws, missing information, or areas for improvement. This self-correction process is key to enhancing the quality and accuracy of its responses.
+## 8. Какова основная идея паттерна Reflection?
 
-## 9. Why is simple "prompt chaining" not enough for high-quality output?** 
+Паттерн Reflection giving агенту ability к step back и критиковать свою own работу. Вместо producing final output за один раз, агент генерирует draft и затем "reflects" на нём, identifying flaws, missing information или areas для improvement. Этот self-correction process ключевой к enhancing качеству и accuracy его ответов.
 
-Simple prompt chaining (where the output of one prompt becomes the input for the next) is often too basic. The model might just rephrase its previous output without genuinely improving it. A true Reflection pattern requires a more structured critique, prompting the agent to analyze its work against specific standards, check for logical errors, or verify facts.
+## 9. Почему простого "prompt chaining" недостаточно для high-quality output?
 
-## 10. What are the two main types of reflection mentioned in this chapter?** 
+Простой prompt chaining (где output одного промпта becomes input для следующего) often too basic. Модель might просто rephrase свой previous output без genuine улучшения. True Reflection паттерн requires more structured critique, prompting агента анализировать свою работу по specific стандартам, checking на logical errors, или verifying facts.
 
-The chapter discusses two primary forms of reflection:
+## 10. Какие два основных типа reflection упоминаются в этой главе?
 
-- **"Check your work" Reflection:** This is a basic form where the agent is simply asked to review and fix its previous output. It's a good starting point for catching simple errors.  
-- **"Internal Critic" Reflection:** This is a more advanced form where a separate, "critic" agent (or a dedicated prompt) is used to evaluate the output of the "worker" agent. This critic can be given specific criteria to look for, leading to more rigorous and targeted improvements.
+Глава обсуждает two primary форм reflection:
 
-## 11. How does reflection help in reducing "hallucinations"?
+- **"Check your work" Reflection:** Это базовая форма, где агента simply просят review и исправить свой previous output. Это good starting point для catching простых ошибок.
+- **"Internal Critic" Reflection:** Это более advanced форма, где отдельный, "critic" агент (или dedicated промпт) используется для evaluating output "worker" агента. Этот critic может быть given specific criteria для поиска, leading к более rigorous и targeted improvements.
 
-By prompting an agent to review its work, especially by comparing its statements against a known source or by checking its own reasoning steps, the Reflection pattern can significantly reduce the likelihood of hallucinations (making up facts). The agent is forced to be more grounded in the provided context and less likely to generate unsupported information.
+## 11. Как reflection помогает в снижении "галлюцинаций"?
 
-## 12. Can the Reflection pattern be applied more than once?
+Путём prompting агента к review своей работы, especially путём comparing statements против known source или checking своих own reasoning steps, Reflection паттерн может significantly reduce likelihood hallucinations (измышления фактов). Агент forced быть более grounded в provided контексте и less likely генерировать unsupported информацию.
 
-Yes, reflection can be an iterative process. An agent can be made to reflect on its work multiple times, with each loop refining the output further. This is particularly useful for complex tasks where the first or second attempt may still contain subtle errors or could be substantially improved.
 
-## 13. What is the Planning pattern in the context of AI agents?
+## 12. Может ли паттерн Reflection применяться более одного раза?
 
-The Planning pattern involves enabling an agent to break down a complex, high-level goal into a sequence of smaller, actionable steps. Instead of trying to solve a big problem at once, the agent first creates a "plan" and then executes each step in the plan, which is a much more reliable approach.
+Да, reflection может быть iterative процесс. Агент может быть made к reflect на своей работе multiple раз, с each loop уточняя output further. Это particularly useful для сложных задач, где первая или вторая попытка may still содержать subtle ошибки или could быть substantially improved.
 
-## 14. Why is planning necessary for complex tasks?
+## 13. Что такое паттерн Planning в контексте AI-агентов?
 
-LLMs can struggle with tasks that require multiple steps or dependencies. Without a plan, an agent might lose track of the overall objective, miss crucial steps, or fail to handle the output of one step as the input for the next. A plan provides a clear roadmap, ensuring all requirements of the original request are met in a logical order.
+Паттерн Planning involves enabling агента к разбиению сложной, высокоуровневой цели на последовательность smaller, actionable шагов. Вместо trying решить big problem за раз, агент сначала создаёт "plan" и затем выполняет каждый шаг в плане, что much more надёжный подход.
 
-## 15. What is a common way to implement the Planning pattern?
+## 14. Почему планирование необходимо для сложных задач?
 
-A common implementation is to have the agent first generate a list of steps in a structured format (like a JSON array or a numbered list). The system can then iterate through this list, executing each step one by one and feeding the result back to the agent to inform the next action.
+LLM могут struggling с задачами, которые требуют multiple steps или dependencies. Без плана, агент might lose track общей objectives, miss crucial steps, или fail обработать output одного шага как input для следующего. План providing clear roadmap, ensuring что all requirements оригинального запроса met в logical порядке.
 
-## 16. How does the agent handle errors or changes during execution?
+## 15. Какой распространённый способ реализации паттерна Planning?
 
-A robust planning pattern allows for dynamic adjustments. If a step fails or the situation changes, the agent can be prompted to "re-plan" from the current state. It can analyze the error, modify the remaining steps, or even add new ones to overcome the obstacle.
+Распространённая реализация — заставить агента сначала сгенерировать список шагов в structured format (such as JSON array или numbered list). Система затем может iterate through этот list, выполняя каждый шаг по одному и feeding результат back к агенту для informing следующего действия.
 
-## 17. Does the user see the plan?
+## 16. Как агент обрабатывает ошибки или изменения во время выполнения?
 
-This is a design choice. In many cases, showing the plan to the user first for approval is a great practice. This aligns with the "Human-in-the-Loop" pattern, giving the user transparency and control over the agent's proposed actions before they are executed.
+Robust planning паттерн allows для dynamic adjustments. Если шаг fails или situation changes, агент может быть prompted к "re-plan" от текущего состояния. Он может проанализировать ошибку, modify remaining шаги, или even добавить новые для overcoming препятствия.
 
-## 18. What does the "Tool Use" pattern entail?
+## 17. Видит ли пользователь план?
 
-The Tool Use pattern allows an agent to extend its capabilities by interacting with external software or APIs. Since an LLM's knowledge is static and it can't perform real-world actions on its own, tools give it access to live information (e.g., Google Search), proprietary data (e.g., a company's database), or the ability to perform actions (e.g., send an email, book a meeting).
+Это design choice. В many cases, showing план пользователю first для approval — great practice. Это aligns с "Human-in-the-Loop" паттерном, giving пользователю transparency и control над proposed действиями агента before их выполнения.
 
-## 19. How does an agent decide which tool to use?
+## 18. Что включает паттерн "Tool Use"?
 
-The agent is typically given a list of available tools along with descriptions of what each tool does and what parameters it requires. When faced with a request it can't handle with its internal knowledge, the agent's reasoning ability allows it to select the most appropriate tool from the list to accomplish the task.
+Паттерн Tool Use allowing агенту расширить свои capabilities через взаимодействие с external software или API. Since knowledge LLM static и он не может perform real-world actions сам, tools giving ему access к live информации (например, Google Search), proprietary данным (например, база данных компании) или ability к perform действиям (например, отправить email, забронировать встречу).
 
-## 20. What is the "ReAct" (Reason and Act) framework mentioned in this context?
+## 19. Как агент решает, какой инструмент использовать?
 
-ReAct is a popular framework that integrates reasoning and acting. The agent follows a loop of **Thought** (reasoning about what it needs to do), **Action** (deciding which tool to use and with what inputs), and **Observation** (seeing the result from the tool). This loop continues until it has gathered enough information to fulfill the user's request.
+Агент typically given список available tools вместе с описаниями what каждый tool делает и what parameters он требует. При встрече с запросом, который он не может handle с internal knowledge, reasoning ability агента allowing ему выбрать most appropriate tool из списка для accomplishing задачи.
 
-## 21. What are some challenges in implementing tool use?
+## 20. Что такое фреймворк "ReAct" (Reason and Act), упомянутый в этом контексте?
 
-Key challenges include:
+ReAct — это popular фреймворк, integrating reasoning и acting. Агент follows loop из **Thought** (рассуждение about what нужно сделать), **Action** (решение какой tool использовать и с какими inputs) и **Observation** (видение результата от tool). Этот loop продолжается until он gathered достаточно информации для fulfillment запроса пользователя.
 
-- **Error Handling:** Tools can fail, return unexpected data, or time out. The agent needs to be able to recognize these errors and decide whether to try again, use a different tool, or ask the user for help.  
-- **Security:** Giving an agent access to tools, especially those that perform actions, has security implications. It's crucial to have safeguards, permissions, and often human approval for sensitive operations.  
-- **Prompting:** The agent must be prompted effectively to generate correctly formatted tool calls (e.g., the right function name and parameters).
+## 21. Какие challenges в реализации использования инструментов?
 
-## 22. What is the Human-in-the-Loop (HITL) pattern?
+Ключевые challenges включают:
 
-HITL is a pattern that integrates human oversight and interaction into the agent's workflow. Instead of being fully autonomous, the agent pauses at critical junctures to ask for human feedback, approval, clarification, or direction.
+- **Обработка ошибок:** Tools могут fail, возвращать unexpected данные или time out. Агент needs быть capable распознать эти ошибки и решить whether попробовать снова, использовать другой tool, или попросить пользователя о помощи.
+- **Безопасность:** Giving агенту access к tools, especially тем, которые performing actions, has security implications. Критически важно иметь safeguards, permissions и often human approval для sensitive операций.
+- **Промптинг:** Агент must быть prompted effectively для генерации correctly formatted tool вызовов (например, right function name и parameters).
 
-## 23. Why is HITL important for agentic systems?
 
-It's crucial for several reasons:
+## 22. Что такое паттерн Human-in-the-Loop (HITL)?
 
-- **Safety and Control:** For high-stakes tasks (e.g., financial transactions, sending official communications), HITL ensures a human verifies the agent's proposed actions before they are executed.  
-- **Improving Quality:** Humans can provide corrections or nuanced feedback that the agent can use to improve its performance, especially in subjective or ambiguous tasks.  
-- **Building Trust:** Users are more likely to trust and adopt an AI system that they can guide and supervise.
+HITL — это паттерн, integrating human oversight и interaction в workflow агента. Вместо being fully автономным, агент pauses на critical junctures для asking human feedback, одобрения, уточнения или направления.
 
-## 24. At what points in a workflow should you include a human?
+## 23. Почему HITL важен для агентных систем?
 
-Common points for human intervention include:
+Это crucial по several reasons:
 
-- **Plan Approval:** Before executing a multi-step plan.  
-- **Tool Use Confirmation:** Before using a tool that has real-world consequences or costs money.  
-- **Ambiguity Resolution:** When the agent is unsure how to proceed or needs more information from the user.  
-- **Final Output Review:** Before delivering the final result to the end-user or system.
+- **Безопасность и контроль:** Для high-stakes задач (например, financial transactions, отправка official communications), HITL ensuring human verifies proposed действия агента before их выполнения.
+- **Улучшение качества:** Humans могут providing corrections или nuanced feedback, который агент может использовать для улучшения своей производительности, especially в subjective или ambiguous задачах.
+- **Построение доверия:** Пользователи more likely trust и adopt AI систему, которую они могут guide и supervise.
 
-## 25. Isn't constant human intervention inefficient?
+## 24. В каких точках workflow нужно включать human?
 
-It can be, which is why the key is to find the right balance. HITL should be implemented at critical checkpoints, not for every single action. The goal is to build a collaborative partnership between the human and the agent, where the agent handles the bulk of the work and the human provides strategic guidance.
+Common точки для human intervention включают:
 
-## 26. What is the Multi-Agent Collaboration pattern?
+- **Одобрение плана:** Before executing multi-step плана.
+- **Подтверждение использования инструментов:** Before using tool, имеющего real-world последствия или costing деньги.
+- **Разрешение неоднозначности:** Когда агент unsure как proceed или needs more информацию от пользователя.
+- **Финальный review output:** Before delivering final результат end-user или системе.
 
-This pattern involves creating a system composed of multiple specialized agents that work together to achieve a common goal. Instead of one "generalist" agent trying to do everything, you create a team of "specialist" agents, each with a specific role or expertise.
+## 25. Разве постоянное human intervention не неэффективно?
 
-## 27. What are the benefits of a multi-agent system?
+Может быть, поэтому ключ — найти right баланс. HITL должен быть implemented на critical checkpoints, не для каждого single действия. Цель — построить collaborative partnership между human и агентом, где агент handles bulk работы и human providing стратегическое руководство.
 
-- **Modularity and Specialization:** Each agent can be fine-tuned and prompted for its specific task (e.g., a "researcher" agent, a "writer" agent, a "code" agent), leading to higher quality results.  
-- **Reduced Complexity:** Breaking a complex workflow down into specialized roles makes the overall system easier to design, debug, and maintain.  
-- **Simulated Brainstorming:** Different agents can offer different perspectives on a problem, leading to more creative and robust solutions, similar to how a human team works.
+## 26. Что такое паттерн Multi-Agent Collaboration?
 
-## 28. What is a common architecture for multi-agent systems?
+Этот паттерн involves creating систему, composed из multiple специализированных агентов, работающих together для достижения общей цели. Вместо одного "generalist" агента, trying делать everything, вы создаёте team из "specialist" агентов, each с specific ролью или expertise.
 
-A common architecture involves an **Orchestrator Agent** (sometimes called a "manager" or "conductor"). The orchestrator understands the overall goal, breaks it down, and delegates sub-tasks to the appropriate specialist agents. It then collects the results from the specialists and synthesizes them into a final output.
+## 27. Какие преимущества multi-agent системы?
 
-## How do the agents communicate with each other?
+- **Модульность и специализация:** Каждый агент может быть fine-tuned и prompted для своей конкретной задачи (например, "researcher" агент, "writer" агент, "code" агент), leading к higher quality результатам.
+- **Сниженная сложность:** Декомпозиция сложного workflow на специализированные роли making общую систему easier design, debug и maintain.
+- **Симулированный brainstorming:** Различные агенты могут offering different perspectives на проблему, leading к более creative и robust решениям, similar к тому как работает human team.
 
-Communication is often managed by the orchestrator. For example, the orchestrator might pass the output of the "researcher" agent to the "writer" agent as context. A shared "scratchpad" or message bus where agents can post their findings is another common communication method.
+## 28. Какова распространённая архитектура для multi-agent систем?
 
-## Why is evaluating an agent more difficult than evaluating a traditional software program?
+Распространённая архитектура involves **Orchestrator Агента** (sometimes called "manager" или "conductor"). Orchestrator понимает общую цель, разбивает её и делегирует подзадачи appropriate specialist агентам. Затем он собирает результаты от specialists и synthesizes их в final output.
 
-Traditional software has deterministic outputs (the same input always produces the same output). Agents, especially those using LLMs, are non-deterministic and their performance can be subjective. Evaluating them requires assessing the *quality* and *relevance* of their output, not just whether it's technically "correct."
+## 29. Как агенты общаются друг с другом?
 
-## What are some common methods for evaluating agent performance?
+Коммуникация often managed orchestrator'ом. Например, orchestrator might передать output "researcher" агента "writer" агенту как контекст. Shared "scratchpad" или message bus, где агенты могут posting свои findings, — другой common метод коммуникации.
 
-The guide suggests a few methods:
+## 30. Почему оценка агента сложнее, чем оценка традиционной программы?
 
-- **Outcome-based Evaluation:** Did the agent successfully achieve the final goal? For example, if the task was "book a flight," was a flight actually booked correctly? This is the most important measure.  
-- **Process-based Evaluation:** Was the agent's *process* efficient and logical? Did it use the right tools? Did it follow a sensible plan? This helps debug why an agent might be failing.  
-- **Human Evaluation:** Having humans score the agent's performance on a scale (e.g., 1-5) based on criteria like helpfulness, accuracy, and coherence. This is crucial for user-facing applications.
+Традиционный софт has deterministic outputs (same input всегда produces same output). Агенты, especially those использующие LLM, являются non-deterministic, и их производительность может быть subjective. Оценка их requires assessing *quality* и *relevance* их output, не просто whether оно technically "correct".
 
-## What is an "agent trajectory"?
+## 31. Какие распространённые методы оценки производительности агентов?
 
-An agent trajectory is the complete log of an agent's steps while performing a task. It includes all its thoughts, actions (tool calls), and observations. Analyzing these trajectories is a key part of debugging and understanding agent behavior.
+Руководство предлагает several методы:
 
-## How can you create reliable tests for a non-deterministic system?
+- **Оценка на основе результата:** Did агент successfully achieve final goal? Например, если задача была "book flight", был ли flight actually booked correctly? Это most important мера.
+- **Оценка на основе процесса:** Был ли *process* агента efficient и logical? Did он использовать right tools? Did он follow sensible plan? Это helps debug почему агент might быть failing.
+- **Human оценка:** Having humans score производительность агента по шкале (например, 1-5) based on criteria such as helpfulness, accuracy и coherence. Это crucial для user-facing приложений.
 
-While you can't guarantee the exact wording of an agent's output, you can create tests that check for key elements. For example, you can write a test that verifies if the agent's final response *contains* specific information or if it successfully called a certain tool with the right parameters. This is often done using mock tools in a dedicated testing environment.
+## 32. Что такое "траектория агента" (agent trajectory)?
 
-## How is prompting an agent different from a simple ChatGPT prompt?
+Траектория агента — это complete log шагов агента while performing задачи. Она includes все его мысли, действия (tool вызовы) и observations. Анализ этих trajectories — ключевая часть debugging и понимания поведения агента.
 
-Prompting an agent involves creating a detailed "system prompt" or constitution that acts as its operating instructions. This goes beyond a single user query; it defines the agent's role, its available tools, the patterns it should follow (like ReAct or Planning), its constraints, and its personality.
+## 33. Как создать надёжные тесты для non-deterministic системы?
 
-## What are the key components of a good system prompt for an agent?
+Хотя вы не можете guarantee exact wording output агента, вы можете создать тесты, которые проверяют key элементы. Например, вы можете написать тест, verifying содержит ли финальный ответ агента specific информацию или successfully вызвал ли он certain tool с right parameters. Это often done с использованием mock tools в dedicated testing среде.
 
-A strong system prompt typically includes:
+## 34. Чем prompting агента отличается от простого промпта ChatGPT?
 
-- **Role and Goal:** Clearly define who the agent is and what its primary purpose is.  
-- **Tool Definitions:** A list of available tools, their descriptions, and how to use them (e.g., in a specific function-calling format).  
-- **Constraints and Rules:** Explicit instructions on what the agent *should not* do (e.g., "Do not use tools without approval," "Do not provide financial advice").  
-- **Process Instructions:** Guidance on which patterns to use. For example, "First, create a plan. Then, execute the plan step-by-step."  
-- **Example Trajectories:** Providing a few examples of successful "thought-action-observation" loops can significantly improve the agent's reliability.
+Prompting агента involves создание detailed "system prompt" или конституции, которая acts как его operating инструкции. Это goes beyond single user query; оно определяет роль агента, его available tools, паттерны, которые он should follow (such as ReAct или Planning), его ограничения и personality.
 
-## What is "prompt leakage"?
+## 35. Какие ключевые компоненты хорошего system prompt для агента?
 
-Prompt leakage occurs when parts of the system prompt (like tool definitions or internal instructions) are inadvertently revealed in the agent's final response to the user. This can be confusing for the user and expose underlying implementation details. Techniques like using separate prompts for reasoning and for generating the final answer can help prevent this.
+Strong system prompt typically включает:
 
-## What are some future trends in agentic systems?
+- **Роль и цель:** Clearly определить кто агент и какова его primary purpose.
+- **Определения инструментов:** Список available tools, их описания и как использовать (например, в specific function-calling формате).
+- **Ограничения и правила:** Явные инструкции about что агент *should not* делать (например, "Не использовать tools без одобрения", "Не предоставлять financial advice").
+- **Инструкции по процессу:** Руководство о том, какие паттерны использовать. Например, "Сначала создай план. Затем выполни план step-by-step."
+- **Примеры траекторий:** Предоставление нескольких примеров успешных "thought-action-observation" loops может significantly улучшить reliability агента.
 
-The guide points towards a future with:
+## 36. Что такое "prompt leakage"?
 
-- **More Autonomous Agents:** Agents that require less human intervention and can learn and adapt on their own.  
-- **Highly Specialized Agents:** An ecosystem of agents that can be hired or subscribed to for specific tasks (e.g., a travel agent, a research agent).  
-- **Better Tools and Platforms:** The development of more sophisticated frameworks and platforms that make it easier to build, test, and deploy robust multi-agent systems.
+Prompt leakage occurs когда parts system prompt (such as tool definitions или internal instructions) inadvertent revealed в финальном ответе агента пользователю. Это может быть confusing для пользователя и expose underlying implementation details. Техники such as использование separate prompts для reasoning и для генерации финального ответа могут помочь prevent это.
+
+## 37. Какие будущие trends в агентных системах?
+
+Руководство указывает к будущему с:
+
+- **More автономными агентами:** Агенты, которые требуют less human intervention и могут learn и adapt самостоятельно.
+- **Высоко специализированными агентами:** Экосистема агентов, которые могут быть hired или subscribed для specific задач (например, travel агент, research агент).
+- **Better tools и platforms:** Разработка более sophisticated фреймворков и platforms, которые making easier создавать, тестировать и deploy надёжные multi-agent системы.
+
+---
+
+Исходный репозиторий: [Mathews-Tom/Agentic-Design-Patterns](https://github.com/Mathews-Tom/Agentic-Design-Patterns)
