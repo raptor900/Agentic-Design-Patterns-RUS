@@ -1,11 +1,11 @@
-To my son, Bruno,
+Моему сыну, Бруно,
 
-who at two years old, brought a new and brilliant light into my life. As I explore the systems that will define our tomorrow, it is the world you will inherit that is foremost in my thoughts.
+который в два года принёс в мою жизнь новый и ослепительный свет. Пока я исследую системы, которые определят наше завтра, именно мир, который ты унаследуешь, находится в самом центре моих мыслей.
 
-To my sons, Leonardo and Lorenzo, and my daughter Aurora,
+Моим сыновьям, Леонардо и Лоренцо, и дочери Ауроре,
 
-My heart is filled with pride for the women and men you have become and the wonderful world you are building.
+ Моё сердце наполняется гордостью за тех, кем вы стали и за прекрасный мир, который вы строите.
 
-This book is about how to build intelligent tools, but it is dedicated to the profound hope that your generation will guide them with wisdom and compassion. The future is incredibly bright, for you and for us all, if we learn to use these powerful technologies to serve humanity and help it progress.
+Эта книга о том, как строить интеллектуальные инструменты, но она посвящена глубокой надежде, что ваше поколение будет направлять их с мудростью и состраданием. Будущее невероятно яркое — для вас и для всех нас — если мы научимся использовать эти мощные технологии на благо человечества и помогать ему прогрессировать.
 
-With all my love.
+Со всей моей любовью.
