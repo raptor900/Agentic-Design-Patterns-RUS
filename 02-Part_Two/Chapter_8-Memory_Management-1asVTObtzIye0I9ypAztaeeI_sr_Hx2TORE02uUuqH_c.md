@@ -12,7 +12,8 @@
 # persistence across application restarts is not required. 
 from google.adk.sessions import InMemorySessionService
 session_service = InMemorySessionService()
-```## Практические применения и сценарии использования
+```
+## Практические применения и сценарии использования
 
 Управление памятью жизненно важно для агентов, которым необходимо отслеживать информацию и работать интеллектуально со временем. Применения включают:
 
@@ -33,7 +34,9 @@ from google.adk.sessions import DatabaseSessionService
 # Example using a local SQLite file: 
 db_url = "sqlite:///./my_agent_data.db"
 session_service = DatabaseSessionService(db_url=db_url)
-```## Практический пример кода: Управление памятью в Google ADK
+```
+
+## Практический пример кода: Управление памятью в Google ADK
 
 Google Agent Developer Kit (ADK) предлагает структурированный метод управления контекстом и памятью. Понимание Session, State и Memory в ADK жизненно важно для построения агентов, которые сохраняют информацию.
 
@@ -70,7 +73,9 @@ session_service = VertexAiSessionService(project=PROJECT_ID, location=LOCATION)
 # session_service.get_session(app_name=REASONING_ENGINE_APP_NAME, ...)
 # session_service.append_event(session, event, app_name=REASONING_ENGINE_APP_NAME)
 # session_service.delete_session(app_name=REASONING_ENGINE_APP_NAME, ...)
-```### Session: Отслеживание каждого диалога
+```
+
+### Session: Отслеживание каждого диалога
 
 Session в ADK отслеживает и управляет отдельными потоками чата. При начале взаимодействия SessionService создаёт объект Session (`google.adk.sessions.Session`), включающий уникальные идентификаторы, хронологию событий, хранилище временных данных (state) и метку последнего обновления. Разработчики обычно взаимодействуют с Session через SessionService, отвечающий за жизненный цикл: создание, возобновление, запись активности, управление удалением.
 
@@ -130,7 +135,9 @@ for event in runner.run(
 # Correctly check the state after the runner has finished processing all events.
 updated_session = session_service.get_session(app_name, user_id, session_id)
 print(f"\nState after agent run: {updated_session.state}")
-```Затем DatabaseSessionService для надёжного сохранения в базу данных.
+```
+
+Затем DatabaseSessionService для надёжного сохранения в базу данных.
 
 ```python
 # Example: Using InMemoryMemoryService
@@ -141,7 +148,9 @@ print(f"\nState after agent run: {updated_session.state}")
 from google.adk.memory import InMemoryMemoryService
 
 memory_service = InMemoryMemoryService()
-```Также доступен VertexAiSessionService для масштабируемой продакшн-среды на Google Cloud.
+```
+
+Также доступен VertexAiSessionService для масштабируемой продакшн-среды на Google Cloud.
 
 ```python
 # Example: Using VertexAiRagMemoryService
@@ -172,7 +181,9 @@ memory_service = VertexAiRagMemoryService(
 # When using this service, methods like add_session_to_memory
 # and search_memory will interact with the specified Vertex AI
 # RAG Corpus.
-```Выбор SessionService критичен — он определяет, как хранятся история взаимодействий и временные данные, и их персистентность.
+```
+
+Выбор SessionService критичен — он определяет, как хранятся история взаимодействий и временные данные, и их персистентность.
 
 Каждый обмен сообщениями — циклический процесс: сообщение получено → Runner извлекает или создаёт Session → агент обрабатывает сообщение с контекстом Session → генерирует ответ и обновляет state → Runner оборачивает в Event → `session_service.append_event` записывает событие и обновляет состояние. Session ожидает следующее сообщение. При завершении взаимодействия вызывается `delete_session`.
 
@@ -208,7 +219,9 @@ history.add_ai_message("Great! It's a fantastic city.")
 
 # Access the list of messages
 print(history.messages)
-```За кулисами Runner видит `output_key` и автоматически создаёт действия с `state_delta` при вызове `append_event`.
+```
+
+За кулисами Runner видит `output_key` и автоматически создаёт действия с `state_delta` при вызове `append_event`.
 
 #### 2. Стандартный способ: `EventActions.state_delta` (для сложных обновлений)
 
@@ -229,7 +242,9 @@ memory.save_context(
 
 # Load the memory as a string
 print(memory.load_memory_variables({}))
-```Этот код демонстрирует подход на основе инструментов для управления состоянием сессии. Функция `log_user_login` — инструмент, обновляющий состояние при входе пользователя: увеличивает счётчик, устанавливает статус задачи, записывает метку времени. Код демонстрации создаёт in-memory сессию, имитирует вызов инструмента и проверяет обновлённое состояние.
+```
+
+Этот код демонстрирует подход на основе инструментов для управления состоянием сессии. Функция `log_user_login` — инструмент, обновляющий состояние при входе пользователя: увеличивает счётчик, устанавливает статус задачи, записывает метку времени. Код демонстрации создаёт in-memory сессию, имитирует вызов инструмента и проверяет обновлённое состояние.
 
 Прямое изменение `session.state` после извлечения сессии настоятельно не рекомендуется — это обходит стандартный механизм обработки событий и может привести к проблемам согласованности. Рекомендуемые методы: `output_key` на LlmAgent или `EventActions.state_delta` при `append_event`.
 
@@ -271,7 +286,9 @@ print(response)
 
 response = conversation.predict(question="What was my name again?")
 print(response)
-```Session и State — краткосрочная память для одного чата. Долгосрочное хранилище MemoryService — персистентный поисковый репозиторий из нескольких прошлых взаимодействий или внешних источников. MemoryService (интерфейс BaseMemoryService) стандартизирует управление: добавление информации (`add_session_to_memory`) и извлечение (`search_memory`).
+```
+
+Session и State — краткосрочная память для одного чата. Долгосрочное хранилище MemoryService — персистентный поисковый репозиторий из нескольких прошлых взаимодействий или внешних источников. MemoryService (интерфейс BaseMemoryService) стандартизирует управление: добавление информации (`add_session_to_memory`) и извлечение (`search_memory`).
 
 ADK предлагает несколько реализаций. InMemoryMemoryService — временное хранилище для тестирования. Для продакшна — VertexAiRagMemoryService, использующий Google Cloud RAG для масштабируемого семантического поиска.
 
@@ -311,7 +328,9 @@ print(response)
 
 response = conversation.predict(question="Do you remember my name?")
 print(response)
-```## Практический пример кода: Управление памятью в LangChain и LangGraph
+```
+
+## Практический пример кода: Управление памятью в LangChain и LangGraph
 
 В LangChain и LangGraph память — критический компонент для создания интеллектуальных разговорных приложений. Она позволяет ИИ-агенту помнить информацию прошлых взаимодействий, учиться на обратной связи и адаптироваться к предпочтениям пользователя.
 
@@ -358,7 +377,9 @@ def call_model(state: State, store: BaseStore):
         instructions=instructions.value["instructions"]
     )
     # ... application logic continues
-```**ConversationBufferMemory: Автоматизированная память для цепочек.** Для интеграции памяти в цепочки. Параметры:
+```
+
+**ConversationBufferMemory: Автоматизированная память для цепочек.** Для интеграции памяти в цепочки. Параметры:
 
 * `memory_key`: Имя переменной в промпте для хранения истории (по умолчанию «history»).
 * `return_messages`: Формат истории — `False` (строка) или `True` (список сообщений, рекомендуется для Chat-моделей).
@@ -406,7 +427,9 @@ items = store.search(
     query="language preferences",
 )
 print("Search Results:", items)
-```Интеграция памяти в LLMChain позволяет модели обращаться к истории диалога и отвечать контекстно.
+```
+
+Интеграция памяти в LLMChain позволяет модели обращаться к истории диалога и отвечать контекстно.
 
 ```python
 from google.adk.memory import VertexAiMemoryBankService
@@ -427,5 +450,7 @@ session = await session_service.get_session(
 )
 
 await memory_service.add_session_to_memory(session)
-```Для chat-моделей рекомендуется использовать структурированный список сообщений с `return_messages=True`.
+```
+
+Для chat-моделей рекомендуется использовать структурированный список сообщений с `return_messages=True`.
 
