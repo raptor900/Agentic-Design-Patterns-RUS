@@ -1,108 +1,104 @@
-# Chapter 3: Parallelization
+# Глава 3: Параллелизация
 
-## Parallelization Pattern Overview
+## Обзор паттерна «Параллелизация»
 
-In the previous chapters, we've explored Prompt Chaining for sequential workflows and Routing for dynamic decision-making and transitions between different paths. While these patterns are essential, many complex agentic tasks involve multiple sub-tasks that can be executed *simultaneously* rather than one after another. This is where the **Parallelization** pattern becomes crucial.
+В предыдущих главах мы рассмотрели цепочку промптов для последовательных рабочих процессов и маршрутизацию для динамического принятия решений и переходов между различными путями. Хотя эти паттерны важны, многие сложные агентные задачи включают несколько подзадач, которые могут выполняться *одновременно*, а не одна за другой. Именно здесь паттерн **«Параллелизация»** становится ключевым.
 
-Parallelization involves executing multiple components, such as LLM calls, tool usages, or even entire sub-agents, concurrently (see Fig.1). Instead of waiting for one step to complete before starting the next, parallel execution allows independent tasks to run at the same time, significantly reducing the overall execution time for tasks that can be broken down into independent parts.
+Параллелизация подразумевает одновременное выполнение нескольких компонентов — вызовов LLM, использования инструментов или даже целых подагентов (см. Рис. 1). Вместо ожидания завершения одного шага перед запуском следующего параллельное выполнение позволяет независимым задачам работать одновременно, существенно сокращая общее время выполнения задач, которые можно разбить на независимые части.
 
-Consider an agent designed to research a topic and summarize its findings. A sequential approach might:
+Рассмотрим агента, задача которого — провести исследование по теме и обобщить результаты. Последовательный подход может выглядеть так:
 
-1. Search for Source A.  
-2. Summarize Source A.  
-3. Search for Source B.  
-4. Summarize Source B.  
-5. Synthesize a final answer from summaries A and B.
+1. Поиск по источнику A.
+2. Обобщение источника A.
+3. Поиск по источнику B.
+4. Обобщение источника B.
+5. Синтез финального ответа на основе обобщений A и B.
 
-A parallel approach could instead:
+Параллельный подход вместо этого:
 
-1. Search for Source A *and* Search for Source B simultaneously.  
-2. Once both searches are complete, Summarize Source A *and* Summarize Source B simultaneously.  
-3. Synthesize a final answer from summaries A and B (this step is typically sequential, waiting for the parallel steps to finish).
+1. Поиск по источнику A *и* поиск по источнику B одновременно.
+2. Как только оба поиска завершены — обобщение источника A *и* обобщение источника B одновременно.
+3. Синтез финального ответа на основе обобщений A и B (этот шаг обычно последовательный, ожидает завершения параллельных шагов).
 
-The core idea is to identify parts of the workflow that do not depend on the output of other parts and execute them in parallel. This is particularly effective when dealing with external services (like APIs or databases) that have latency, as you can issue multiple requests concurrently.
+Основная идея — выявить части рабочего процесса, не зависящие от вывода других частей, и выполнить их параллельно. Это особенно эффективно при работе с внешними сервисами (API, базы данных), имеющими задержку, — вы можете отправлять несколько запросов одновременно.
 
-Implementing parallelization often requires frameworks that support asynchronous execution or multi-threading/multi-processing. Modern agentic frameworks are designed with asynchronous operations in mind, allowing you to easily define steps that can run in parallel.
+Реализация параллелизации часто требует фреймворков с поддержкой асинхронного выполнения или многопоточности/мультпроцессинга. Современные агентные фреймворки спроектированы с учётом асинхронных операций, позволяя легко определять шаги, выполняемые параллельно.
 
-![Parallelization with Sub-Agents](../assets/Parallelization_with_Sub_Agents.png)
+![Параллелизация с подагентами](../assets/Parallelization_with_Sub_Agents.png)
 
-Fig.1. Example of parallelization with sub-agents
+Рис. 1. Пример параллелизации с подагентами
 
-Frameworks like LangChain, LangGraph, and Google ADK provide mechanisms for parallel execution. In LangChain Expression Language (LCEL), you can achieve parallel execution by combining runnable objects using operators like | (for sequential) and by structuring your chains or graphs to have branches that execute concurrently. LangGraph, with its graph structure, allows you to define multiple nodes that can be executed from a single state transition, effectively enabling parallel branches in the workflow. Google ADK provides robust, native mechanisms to facilitate and manage the parallel execution of agents, significantly enhancing the efficiency and scalability of complex, multi-agent systems. This inherent capability within the ADK framework allows developers to design and implement solutions where multiple agents can operate concurrently, rather than sequentially.
+Фреймворки вроде LangChain, LangGraph и Google ADK предоставляют механизмы параллельного выполнения. В LangChain Expression Language (LCEL) параллелизация достигается через объединение исполняемых объектов с помощью операторов (например, `|` для последовательных связей) и структурирования цепочек или графов с ветвями, выполняющимися параллельно. LangGraph с его графовой структурой позволяет определять несколько узлов, запускаемых из одного перехода состояния, эффективно включая параллельные ветви в рабочем процессе. Google ADK предоставляет нативные механизмы для параллельного выполнения агентов.
 
-The Parallelization pattern is vital for improving the efficiency and responsiveness of agentic systems, especially when dealing with tasks that involve multiple independent lookups, computations, or interactions with external services. It's a key technique for optimizing the performance of complex agent workflows.
+Паттерн параллелизации критически важен для повышения эффективности и отзывчивости агентных систем, особенно при задачах с множеством независимых обращений к внешним сервисам.
 
-## Practical Applications & Use Cases
+## Практические применения и сценарии использования
 
-Parallelization is a powerful pattern for optimizing agent performance across various applications:
+### 1. Сбор информации и исследования
 
-### 1. Information Gathering and Research
+Сбор данных из нескольких источников одновременно — классический сценарий.
 
-Collecting information from multiple sources simultaneously is a classic use case.
+* **Сценарий:** Агент исследует компанию.
+  * **Параллельные задачи:** Поиск новостных статей, загрузка биржевых данных, проверка упоминаний в соцсетях, запрос к базе данных компаний — всё одновременно.
+  * **Выгода:** Полная картина формируется значительно быстрее последовательных запросов.
 
-* **Use Case:** An agent researching a company.  
-  * **Parallel Tasks:** Search news articles, pull stock data, check social media mentions, and query a company database, all at the same time.  
-  * **Benefit:** Gathers a comprehensive view much faster than sequential lookups.
+### 2. Обработка и анализ данных
 
-### 2. Data Processing and Analysis
+Применение различных техник анализа или обработка разных сегментов данных параллельно.
 
-Applying different analysis techniques or processing different data segments concurrently.
+* **Сценарий:** Агент анализирует отзывы клиентов.
+  * **Параллельные задачи:** Анализ тональности, извлечение ключевых слов, категоризация отзывов, выявление срочных проблем — одновременно по пакету отзывов.
+  * **Выгода:** Многоаспектный анализ за короткое время.
 
-* **Use Case:** An agent analyzing customer feedback.  
-  * **Parallel Tasks:** Run sentiment analysis, extract keywords, categorize feedback, and identify urgent issues simultaneously across a batch of feedback entries.  
-  * **Benefit:** Provides a multi-faceted analysis quickly.
+### 3. Взаимодействие с несколькими API или инструментами
 
-### 3. Multi-API or Tool Interaction
+Вызов нескольких независимых API для сбора разных типов информации или выполнения различных действий.
 
-Calling multiple independent APIs or tools to gather different types of information or perform different actions.
+* **Сценарий:** Агент планирования путешествий.
+  * **Параллельные задачи:** Проверка цен на авиабилеты, поиск доступности отелей, поиск местных мероприятий, рекомендации ресторанов — одновременно.
+  * **Выгода:** Полный план путешествия формируется быстрее.
 
-* **Use Case:** A travel planning agent.  
-  * **Parallel Tasks:** Check flight prices, search for hotel availability, look up local events, and find restaurant recommendations concurrently.  
-  * **Benefit:** Presents a complete travel plan faster.
+### 4. Генерация контента с несколькими компонентами
 
-### 4. Content Generation with Multiple Components
+Генерация разных частей сложного контента параллельно.
 
-Generating different parts of a complex piece of content in parallel.
+* **Сценарий:** Агент создаёт маркетинговое письмо.
+  * **Параллельные задачи:** Генерация темы, черновик тела письма, поиск подходящего изображения, создание текста кнопки призыва к действию — одновременно.
+  * **Выгода:** Финальное письмо собирается эффективнее.
 
-* **Use Case:** An agent creating a marketing email.  
-  * **Parallel Tasks:** Generate a subject line, draft the email body, find a relevant image, and create a call-to-action button text simultaneously.  
-  * **Benefit:** Assembles the final email more efficiently.
+### 5. Валидация и проверка
 
-### 5. Validation and Verification
+Проведение нескольких независимых проверок параллельно.
 
-Performing multiple independent checks or validations concurrently.
+* **Сценарий:** Агент проверяет пользовательский ввод.
+  * **Параллельные задачи:** Проверка формата email, валидация номера телефона, проверка адреса по базе данных, фильтрация ненормативной лексики — одновременно.
+  * **Выгода:** Быстрая обратная связь по корректности ввода.
 
-* **Use Case:** An agent verifying user input.  
-  * **Parallel Tasks:** Check email format, validate phone number, verify address against a database, and check for profanity simultaneously.  
-  * **Benefit:** Provides faster feedback on input validity.
+### 6. Мультимодальная обработка
 
-### 6. Multi-Modal Processing
+Параллельная обработка различных модальностей (текст, изображение, аудио) одного входа.
 
-Processing different modalities (text, image, audio) of the same input concurrently.
+* **Сценарий:** Агент анализирует пост в соцсети с текстом и изображением.
+  * **Параллельные задачи:** Анализ текста на тональность и ключевые слова *и* анализ изображения на объекты и описание сцены — одновременно.
+  * **Выгода:** Быстрая интеграция инсайтов из разных модальностей.
 
-* **Use Case:** An agent analyzing a social media post with text and an image.  
-  * **Parallel Tasks:** Analyze the text for sentiment and keywords *and* analyze the image for objects and scene description simultaneously.  
-  * **Benefit:** Integrates insights from different modalities more quickly.
+### 7. A/B-тестирование или генерация вариантов
 
-### 7. A/B Testing or Multiple Options Generation
+Генерация нескольких вариантов ответа параллельно для выбора лучшего.
 
-Generating multiple variations of a response or output in parallel to select the best one.
+* **Сценарий:** Агент генерирует различные варианты креативного текста.
+  * **Параллельные задачи:** Генерация трёх разных заголовков для статьи одновременно с использованием слегка разных промптов или моделей.
+  * **Выгода:** Быстрое сравнение и выбор лучшего варианта.
 
-* **Use Case:** An agent generating different creative text options.  
-  * **Parallel Tasks:** Generate three different headlines for an article simultaneously using slightly different prompts or models.  
-  * **Benefit:** Allows for quick comparison and selection of the best option.
+Параллелизация — фундаментальная техника оптимизации в агентном дизайне, позволяющая разработчикам создавать более производительные приложения за счёт одновременного выполнения независимых задач.
 
-Parallelization is a fundamental optimization technique in agentic design, allowing developers to build more performant and responsive applications by leveraging concurrent execution for independent tasks.
+## Практический пример кода (LangChain)
 
-## Hands-On Code Example (LangChain)
+Параллельное выполнение в LangChain реализуется через LangChain Expression Language (LCEL). Основной метод — структурирование нескольких исполняемых компонентов в словарь или список. При передаче такой коллекции следующему компоненту цепочки среда выполнения LCEL запускает вложенные исполняемые объекты одновременно.
 
-Parallel execution within the LangChain framework is facilitated by the LangChain Expression Language (LCEL). The primary method involves structuring multiple runnable components within a dictionary or list construct. When this collection is passed as input to a subsequent component in the chain, the LCEL runtime executes the contained runnables concurrently.
+В LangGraph этот принцип применяется к топологии графа. Параллельные рабочие процессы определяются архитектурой графа, в которой несколько узлов без прямых последовательных зависимостей могут быть запущены из одного общего узла.
 
-In the context of LangGraph, this principle is applied to the graph's topology. Parallel workflows are defined by architecting the graph such that multiple nodes, lacking direct sequential dependencies, can be initiated from a single common node. These parallel pathways execute independently before their results can be aggregated at a subsequent convergence point in the graph.
-
-The following implementation demonstrates a parallel processing workflow constructed with the LangChain framework. This workflow is designed to execute two independent operations concurrently in response to a single user query. These parallel processes are instantiated as distinct chains or functions, and their respective outputs are subsequently aggregated into a unified result.
-
-The prerequisites for this implementation include the installation of the requisite Python packages, such as langchain, langchain-community, and a model provider library like langchain-openai. Furthermore, a valid API key for the chosen language model must be configured in the local environment for authentication.
+Ниже представлен пример параллельного рабочего процесса на LangChain, выполняющего две независимые операции одновременно в ответ на один пользовательский запрос.
 
 ```python
 import os
@@ -115,17 +111,16 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 
 
-# --- Configuration ---
-# Ensure your API key environment variable is set (e.g., OPENAI_API_KEY)
+# --- Конфигурация ---
 try:
     llm: Optional[ChatOpenAI] = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 except Exception as e:
-    print(f"Error initializing language model: {e}")
+    print(f"Ошибка инициализации языковой модели: {e}")
     llm = None
 
 
-# --- Define Independent Chains ---
-# These three chains represent distinct tasks that can be executed in parallel.
+# --- Определение независимых цепочек ---
+# Эти три цепочки представляют независимые задачи, выполняемые параллельно.
 summarize_chain: Runnable = (
     ChatPromptTemplate.from_messages([
         ("system", "Summarize the following topic concisely:"),
@@ -154,77 +149,64 @@ terms_chain: Runnable = (
 )
 
 
-# --- Build the Parallel + Synthesis Chain ---
-# 1. Define the block of tasks to run in parallel. The results of these,
-#    along with the original topic, will be fed into the next step.
+# --- Построение параллельной + синтезирующей цепочки ---
+# 1. Блок задач для параллельного выполнения.
 map_chain = RunnableParallel(
     {
         "summary": summarize_chain,
         "questions": questions_chain,
         "key_terms": terms_chain,
-        "topic": RunnablePassthrough(),  # Pass the original topic through
+        "topic": RunnablePassthrough(),
     }
 )
 
-# 2. Define the final synthesis prompt which will combine the parallel results.
+# 2. Финальный промпт синтеза, объединяющий параллельные результаты.
 synthesis_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        """Based on the following information:
-        Summary: {summary}
-        Related Questions: {questions}
-        Key Terms: {key_terms}
-        Synthesize a comprehensive answer."""
+        "Based on the following information:\n"
+        "Summary: {summary}\n"
+        "Related Questions: {questions}\n"
+        "Key Terms: {key_terms}\n"
+        "Synthesize a comprehensive answer."
     ),
     ("user", "Original topic: {topic}"),
 ])
 
-# 3. Construct the full chain by piping the parallel results directly
-#    into the synthesis prompt, followed by the LLM and output parser.
+# 3. Полная цепочка: параллельные результаты → промпт синтеза → LLM → парсер.
 full_parallel_chain = map_chain | synthesis_prompt | llm | StrOutputParser()
 
 
-# --- Run the Chain ---
+# --- Запуск цепочки ---
 async def run_parallel_example(topic: str) -> None:
-    """
-    Asynchronously invokes the parallel processing chain with a specific topic
-    and prints the synthesized result.
-
-    Args:
-        topic: The input topic to be processed by the LangChain chains.
-    """
+    """Асинхронный вызов цепочки параллельной обработки."""
     if not llm:
-        print("LLM not initialized. Cannot run example.")
+        print("LLM не инициализирована.")
         return
 
-    print(f"\n--- Running Parallel LangChain Example for Topic: '{topic}' ---")
+    print(f"\n--- Параллельный пример LangChain для темы: '{topic}' ---")
     try:
-        # The input to `ainvoke` is the single 'topic' string,
-        # then passed to each runnable in the `map_chain`.
         response = await full_parallel_chain.ainvoke(topic)
-        print("\n--- Final Response ---")
+        print("\n--- Финальный ответ ---")
         print(response)
     except Exception as e:
-        print(f"\nAn error occurred during chain execution: {e}")
+        print(f"\nОшибка при выполнении цепочки: {e}")
 
 
 if __name__ == "__main__":
     test_topic = "The history of space exploration"
-    # In Python 3.7+, asyncio.run is the standard way to run an async function.
     asyncio.run(run_parallel_example(test_topic))
 ```
 
-The provided Python code implements a LangChain application designed for processing a given topic efficiently by leveraging parallel execution. Note that asyncio provides concurrency, not parallelism. It achieves this on a single thread by using an event loop that intelligently switches between tasks when one is idle (e.g., waiting for a network request). This creates the effect of multiple tasks progressing at once, but the code itself is still being executed by only one thread, constrained by Python's Global Interpreter Lock (GIL).
+Данный код реализует приложение LangChain для эффективной обработки заданной темы за счёт параллельного выполнения. Обратите внимание, что asyncio обеспечивает конкурентность, а не истинный параллелизм. Он достигает этого на одном потоке с помощью цикла событий, переключающегося между задачами при простое (например, при сетевом запросе). Это создаёт эффект одновременного выполнения нескольких задач, но код по-прежнему выполняется одним потоком, ограниченным Global Interpreter Lock (GIL) Python.
 
-The code begins by importing essential modules from `langchain_openai` and `langchain_core`, including components for language models, prompts, output parsing, and runnable structures. The code attempts to initialize a ChatOpenAI instance, specifically using the "gpt-4o-mini" model, with a specified temperature for controlling creativity. A try-except block is used for robustness during the language model initialization. Three independent LangChain "chains" are then defined, each designed to perform a distinct task on the input topic. The first chain is for summarizing the topic concisely, using a system message and a user message containing the topic placeholder. The second chain is configured to generate three interesting questions related to the topic. The third chain is set up to identify between 5 and 10 key terms from the input topic, requesting them to be comma-separated. Each of these independent chains consists of a ChatPromptTemplate tailored to its specific task, followed by the initialized language model and a StrOutputParser to format the output as a string.
+Код импортирует модули из `langchain_openai` и `langchain_core`. Пытается инициализировать ChatOpenAI с моделью «gpt-4o-mini». Определяются три независимые цепочки LangChain: для обобщения темы, генерации трёх вопросов и извлечения 5–10 ключевых терминов. Каждая цепочка состоит из ChatPromptTemplate, языковой модели и StrOutputParser.
 
-A RunnableParallel block is then constructed to bundle these three chains, allowing them to execute simultaneously. This parallel runnable also includes a RunnablePassthrough to ensure the original input topic is available for subsequent steps. A separate ChatPromptTemplate is defined for the final synthesis step, taking the summary, questions, key terms, and the original topic as input to generate a comprehensive answer. The full end-to-end processing chain, named `full_parallel_chain`, is created by sequencing the `map_chain` (the parallel block) into the synthesis prompt, followed by the language model and the output parser. An asynchronous function `run_parallel_example` is provided to demonstrate how to invoke this `full_parallel_chain`. This function takes the topic as input and uses invoke to run the asynchronous chain. Finally, the standard Python `if __name__ \== "__main__":` block shows how to execute the `run_parallel_example` with a sample topic, in this case, "The history of space exploration", using asyncio.run to manage the asynchronous execution.
+Блок RunnableParallel объединяет эти три цепочки для одновременного выполнения, включая RunnablePassthrough для передачи исходной темы. Отдельный ChatPromptTemplate определён для финального синтеза. Полная цепочка `full_parallel_chain` создаётся путём связывания параллельного блока с промптом синтеза, моделью и парсером. Асинхронная функция `run_parallel_example` демонстрирует вызов с использованием `ainvoke`.
 
-In essence, this code sets up a workflow where multiple LLM calls (for summarizing, questions, and terms) happen at the same time for a given topic, and their results are then combined by a final LLM call. This showcases the core idea of parallelization in an agentic workflow using LangChain.
+По сути, код создаёт рабочий процесс, где несколько вызовов LLM (обобщение, вопросы, термины) выполняются одновременно, а их результаты затем объединяются финальным вызовом LLM.
 
-## Hands-On Code Example (Google ADK)
-
-Okay, let's now turn our attention to a concrete example illustrating these concepts within the Google ADK framework. We'll examine how the ADK primitives, such as ParallelAgent and SequentialAgent, can be applied to build an agent flow that leverages concurrent execution for improved efficiency.
+## Практический пример кода (Google ADK)
 
 ```python
 from google.adk.agents import LlmAgent, ParallelAgent, SequentialAgent
@@ -233,45 +215,40 @@ from google.adk.tools import google_search
 GEMINI_MODEL = "gemini-2.0-flash"
 
 
-# --- 1. Define Researcher Sub-Agents (to run in parallel) ---
+# --- 1. Определение подагентов-исследователей (параллельное выполнение) ---
 
-# Researcher 1: Renewable Energy
+# Исследователь 1: Возобновляемая энергия
 researcher_agent_1 = LlmAgent(
     name="RenewableEnergyResearcher",
     model=GEMINI_MODEL,
     instruction="""You are an AI Research Assistant specializing in energy. Research the latest advancements in 'renewable energy sources'. Use the Google Search tool provided. Summarize your key findings concisely (1-2 sentences). Output *only* the summary. """,
     description="Researches renewable energy sources.",
     tools=[google_search],
-    # Store result in state for the merger agent
     output_key="renewable_energy_result",
 )
 
-# Researcher 2: Electric Vehicles
+# Исследователь 2: Электромобили
 researcher_agent_2 = LlmAgent(
     name="EVResearcher",
     model=GEMINI_MODEL,
     instruction="""You are an AI Research Assistant specializing in transportation. Research the latest developments in 'electric vehicle technology'. Use the Google Search tool provided. Summarize your key findings concisely (1-2 sentences). Output *only* the summary. """,
     description="Researches electric vehicle technology.",
     tools=[google_search],
-    # Store result in state for the merger agent
     output_key="ev_technology_result",
 )
 
-# Researcher 3: Carbon Capture
+# Исследователь 3: Углеродный захват
 researcher_agent_3 = LlmAgent(
     name="CarbonCaptureResearcher",
     model=GEMINI_MODEL,
     instruction="""You are an AI Research Assistant specializing in climate solutions. Research the current state of 'carbon capture methods'. Use the Google Search tool provided. Summarize your key findings concisely (1-2 sentences). Output *only* the summary. """,
     description="Researches carbon capture methods.",
     tools=[google_search],
-    # Store result in state for the merger agent
     output_key="carbon_capture_result",
 )
 
 
-# --- 2. Create the ParallelAgent (Runs researchers concurrently) ---
-# This agent orchestrates the concurrent execution of the researchers.
-# It finishes once all researchers have completed and stored their results in state.
+# --- 2. Создание ParallelAgent (запуск исследователей параллельно) ---
 parallel_research_agent = ParallelAgent(
     name="ParallelWebResearchAgent",
     sub_agents=[researcher_agent_1, researcher_agent_2, researcher_agent_3],
@@ -279,15 +256,13 @@ parallel_research_agent = ParallelAgent(
 )
 
 
-# --- 3. Define the Merger Agent (Runs after the parallel agents) ---
-# This agent takes the results stored in the session state by the parallel agents
-# and synthesizes them into a single, structured response with attributions.
+# --- 3. Определение агента-объединителя (запускается после параллельных) ---
 merger_agent = LlmAgent(
     name="SynthesisAgent",
-    model=GEMINI_MODEL,  # Or potentially a more powerful model if needed for synthesis
-    instruction="""You are an AI Assistant responsible for combining research findings into a structured report. Your primary task is to synthesize the following research summaries, clearly attributing findings to their source areas. Structure your response using headings for each topic. Ensure the report is coherent and integrates the key points smoothly.
+    model=GEMINI_MODEL,
+    instruction="""You are an AI Assistant responsible for combining research findings into a structured report. Your primary task is to synthesize the following research summaries, clearly attributing findings to their source areas. Structure your response using headings for each topic.
 
-**Crucially:** Your entire response MUST be grounded *exclusively* on the information provided in the 'Input Summaries' below. Do NOT add any external knowledge, facts, or details not present in these specific summaries.
+**Crucially:** Your entire response MUST be grounded *exclusively* on the information provided in the 'Input Summaries' below. Do NOT add any external knowledge.
 
 **Input Summaries:**
 *   **Renewable Energy:**
@@ -300,13 +275,13 @@ merger_agent = LlmAgent(
 **Output Format:**
 ## Summary of Recent Sustainable Technology Advancements
 
-### Renewable Energy Findings (Based on RenewableEnergyResearcher's findings)
+### Renewable Energy Findings
 [Synthesize and elaborate *only* on the renewable energy input summary provided above.]
 
-### Electric Vehicle Findings (Based on EVResearcher's findings)
+### Electric Vehicle Findings
 [Synthesize and elaborate *only* on the EV input summary provided above.]
 
-### Carbon Capture Findings (Based on CarbonCaptureResearcher's findings)
+### Carbon Capture Findings
 [Synthesize and elaborate *only* on the carbon capture input summary provided above.]
 
 ### Overall Conclusion
@@ -314,18 +289,13 @@ merger_agent = LlmAgent(
 
 Output *only* the structured report following this format. Do not include introductory or concluding phrases outside this structure, and strictly adhere to using only the provided input summary content.
 """,
-    description="Combines research findings from parallel agents into a structured, cited report, strictly grounded on provided inputs.",
-    # No tools needed for merging
-    # No output_key needed here, as its direct response is the final output of the sequence
+    description="Combines research findings from parallel agents into a structured report.",
 )
 
 
-# --- 4. Create the SequentialAgent (Orchestrates the overall flow) ---
-# This is the main agent that will be run. It first executes the ParallelAgent
-# to populate the state, and then executes the MergerAgent to produce the final output.
+# --- 4. Создание SequentialAgent (оркестрация общего потока) ---
 sequential_pipeline_agent = SequentialAgent(
     name="ResearchAndSynthesisPipeline",
-    # Run parallel research first, then merge
     sub_agents=[parallel_research_agent, merger_agent],
     description="Coordinates parallel research and synthesizes the results.",
 )
@@ -333,52 +303,42 @@ sequential_pipeline_agent = SequentialAgent(
 root_agent = sequential_pipeline_agent
 ```
 
-This code defines a multi-agent system used to research and synthesize information on sustainable technology advancements. It sets up three LlmAgent instances to act as specialized researchers. `ResearcherAgent_1` focuses on renewable energy sources, `ResearcherAgent_2` researches electric vehicle technology, and `ResearcherAgent_3` investigates carbon capture methods. Each researcher agent is configured to use a `GEMINI_MODEL` and the `google_search` tool. They are instructed to summarize their findings concisely (1-2 sentences) and store these summaries in the session state using `output_key`.
+Этот код определяет многоагентную систему для исследования и синтеза информации. Определяются три LlmAgent-исследователя: по возобновляемой энергии, электромобилям и углеродному захвату. Каждый настроен на модель GEMINI_MODEL и инструмент `google_search`, обобщает находки в 1–2 предложения и сохраняет в состоянии сессии через `output_key`.
 
-A ParallelAgent named ParallelWebResearchAgent is then created to run these three researcher agents concurrently. This allows the research to be conducted in parallel, potentially saving time. The ParallelAgent completes its execution once all its sub-agents (the researchers) have finished and populated the state.
+ParallelAgent запускает трёх исследователей одновременно. Завершается, когда все подагенты заполнили состояние. Затем MergerAgent синтезирует результаты в структурированный отчёт с атрибуцией, строго основанный только на предоставленных входных данных.
 
-Next, a MergerAgent (also an LlmAgent) is defined to synthesize the research results. This agent takes the summaries stored in the session state by the parallel researchers as input. Its instruction emphasizes that the output must be strictly based only on the provided input summaries, prohibiting the addition of external knowledge. The MergerAgent is designed to structure the combined findings into a report with headings for each topic and a brief overall conclusion.
+SequentialAgent orchestrates: сначала ParallelAgent для исследования, затем MergerAgent для синтеза. Это `root_agent` системы.
 
-Finally, a SequentialAgent named ResearchAndSynthesisPipeline is created to orchestrate the entire workflow. As the primary controller, this main agent first executes the ParallelAgent to perform the research. Once the ParallelAgent is complete, the SequentialAgent then executes the MergerAgent to synthesize the collected information. The `sequential_pipeline_agent` is set as the `root_agent`, representing the entry point for running this multi-agent system. The overall process is designed to efficiently gather information from multiple sources in parallel and then combine it into a single, structured report.
+## Краткий обзор
 
-## At a Glance
+**Что:** Многие агентные рабочие процессы включают независимые подзадачи. Чисто последовательное выполнение неэффективно и медленно, особенно при обращениях к внешним API.
 
-**What:** Many agentic workflows involve multiple sub-tasks that must be completed to achieve a final goal. A purely sequential execution, where each task waits for the previous one to finish, is often inefficient and slow. This latency becomes a significant bottleneck when tasks depend on external I/O operations, such as calling different APIs or querying multiple databases. Without a mechanism for concurrent execution, the total processing time is the sum of all individual task durations, hindering the system's overall performance and responsiveness.
+**Почему:** Паттерн параллелизации позволяет одновременно выполнять независимые задачи. Фреймворки LangChain и Google ADK предоставляют встроенные конструкции для управления параллельными операциями.
 
-**Why:** The Parallelization pattern provides a standardized solution by enabling the simultaneous execution of independent tasks. It works by identifying components of a workflow, like tool usages or LLM calls, that do not rely on each other's immediate outputs. Agentic frameworks like LangChain and the Google ADK provide built-in constructs to define and manage these concurrent operations. For instance, a main process can invoke several sub-tasks that run in parallel and wait for all of them to complete before proceeding to the next step. By running these independent tasks at the same time rather than one after another, this pattern drastically reduces the total execution time.
+**Когда использовать:** Когда рабочий процесс содержит несколько независимых операций: запросы к разным API, обработка разных фрагментов данных, генерация нескольких вариантов контента.
 
-**Rule of thumb:** Use this pattern when a workflow contains multiple independent operations that can run simultaneously, such as fetching data from several APIs, processing different chunks of data, or generating multiple pieces of content for later synthesis.
+**Визуальное резюме:**
 
-**Visual summary:**
+![Паттерн параллелизации](../assets/Parallelization_Design_Pattern.png)
 
-![Parallelization Design Pattern](../assets/Parallelization_Design_Pattern.png)
+Рис. 2: Паттерн «Параллелизация»
 
-Fig.2: Parallelization design pattern
+## Ключевые выводы
 
-## Key Takeaways
+* Параллелизация — паттерн одновременного выполнения независимых задач для повышения эффективности.
+* Особенно полезен, когда задачи связаны с ожиданием внешних ресурсов (API-вызовы).
+* Использование параллельной архитектуры вносит существенную сложность: дизайн, отладка, логирование.
+* LangChain и Google ADK предоставляют встроенную поддержку параллельного выполнения.
+* В LCEL RunnableParallel — ключевая конструкция для параллельного запуска.
+* Google ADK реализует параллелизация через LLM-делегирование: координатор идентифицирует независимые подзадачи и запускает параллельное выполнение специализированными подагентами.
+* Параллелизация снижает общую латентность и повышает отзывчивость агентных систем.
 
-Here are the key takeaways:
+## Заключение
 
-* Parallelization is a pattern for executing independent tasks concurrently to improve efficiency.  
-* It is particularly useful when tasks involve waiting for external resources, such as API calls.  
-* The adoption of a concurrent or parallel architecture introduces substantial complexity and cost, impacting key development phases such as design, debugging, and system logging.  
-* Frameworks like LangChain and Google ADK provide built-in support for defining and managing parallel execution.  
-* In LangChain Expression Language (LCEL), RunnableParallel is a key construct for running multiple runnables side-by-side.  
-* Google ADK can facilitate parallel execution through LLM-Driven Delegation, where a Coordinator agent's LLM identifies independent sub-tasks and triggers their concurrent handling by specialized sub-agents.  
-* Parallelization helps reduce overall latency and makes agentic systems more responsive for complex tasks.
+Паттерн параллелизации оптимизирует вычислительные рабочие процессы за счёт одновременного выполнения независимых подзадач. Интеграция параллельной обработки с последовательной (цепочки) и условной (маршрутизация) логикой позволяет строить сложные высокопроизводительные системы.
 
-## Conclusion
+## Ссылки
 
-The parallelization pattern is a method for optimizing computational workflows by concurrently executing independent sub-tasks. This approach reduces overall latency, particularly in complex operations that involve multiple model inferences or calls to external services.
-
-Frameworks provide distinct mechanisms for implementing this pattern. In LangChain, constructs like RunnableParallel are used to explicitly define and execute multiple processing chains simultaneously. In contrast, frameworks like the Google Agent Developer Kit (ADK) can achieve parallelization through multi-agent delegation, where a primary coordinator model assigns different sub-tasks to specialized agents that can operate concurrently.
-
-By integrating parallel processing with sequential (chaining) and conditional (routing) control flows, it becomes possible to construct sophisticated, high-performance computational systems capable of efficiently managing diverse and complex tasks.
-
-## References
-
-Here are some resources for further reading on the Parallelization pattern and related concepts:
-
-1. LangChain Expression Language (LCEL) Documentation (Parallelism): [https://python.langchain.com/docs/concepts/lcel/](https://python.langchain.com/docs/concepts/lcel/)
-2. Google Agent Developer Kit (ADK) Documentation (Multi-Agent Systems): [https://google.github.io/adk-docs/agents/multi-agents/](https://google.github.io/adk-docs/agents/multi-agents/)  
-3. Python `asyncio` Documentation: [https://docs.python.org/3/library/asyncio.html](https://docs.python.org/3/library/asyncio.html)
+1. Документация LangChain Expression Language (LCEL): [https://python.langchain.com/docs/concepts/lcel/](https://python.langchain.com/docs/concepts/lcel/)
+2. Документация Google ADK (многоагентные системы): [https://google.github.io/adk-docs/agents/multi-agents/](https://google.github.io/adk-docs/agents/multi-agents/)
+3. Документация Python asyncio: [https://docs.python.org/3/library/asyncio.html](https://docs.python.org/3/library/asyncio.html)
