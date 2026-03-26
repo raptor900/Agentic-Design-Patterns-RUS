@@ -56,56 +56,46 @@
 
 Запрос JSON, XML, CSV для machine-readable формата. Pydantic для валидации через `model_validate_json`.
 
-```python
-from pydantic import BaseModel, EmailStr, Field, ValidationError
-from typing import List, Optional
-from datetime import date
+```), XML tags (<instruction>, <context>), or markers (---), can be utilized to visually and programmatically separate these sections. This practice, widely used in prompt engineering, minimizes misinterpretation by the model, ensuring clarity regarding the role of each part of the prompt.
 
+* **Example:**  
+  <instruction>Summarize the following article, focusing on the main arguments presented by the author.</instruction>  
+  <article>  
+  [Insert the full text of the article here]  
+  </article>
 
-# --- Pydantic Model Definition (from above) ---
-class User(BaseModel):
-    name: str = Field(..., description="The full name of the user.")
-    email: EmailStr = Field(..., description="The user's email address.")
-    date_of_birth: Optional[date] = Field(None, description="The user's date of birth.")
-    interests: List[str] = Field(default_factory=list, description="A list of the user's interests.")
+## Contextual Engineering
 
+Context engineering, unlike static system prompts, dynamically provides background information crucial for tasks and conversations. This ever-changing information helps models grasp nuances, recall past interactions, and integrate relevant details, leading to grounded responses and smoother exchanges. Examples include previous dialogue, relevant documents (as in Retrieval Augmented Generation), or specific operational parameters. For instance, when discussing a trip to Japan, one might ask for three family-friendly activities in Tokyo, leveraging the existing conversational context. In agentic systems, context engineering is fundamental to core agent behaviors like memory persistence, decision-making, and coordination across sub-tasks. Agents with dynamic contextual pipelines can sustain goals over time, adapt strategies, and collaborate seamlessly with other agents or tools—qualities essential for long-term autonomy. This methodology posits that the quality of a model's output depends more on the richness of the provided context than on the model's architecture. It signifies a significant evolution from traditional prompt engineering, which primarily focused on optimizing the phrasing of immediate user queries. Context engineering expands its scope to include multiple layers of information.
 
-# --- Hypothetical LLM Output ---
-llm_output_json = """
-{
-    "name": "Alice Wonderland",
-    "email": "alice.w@example.com",
-    "date_of_birth": "1995-07-21",
-    "interests": [
-        "Natural Language Processing",
-        "Python Programming",
-        "Gardening"
-    ]
-}
-"""
+These layers include:
 
+* **System prompts:** Foundational instructions that define the AI's operational parameters (e.g., "You are a technical writer; your tone must be formal and precise").  
+* **External data:**  
+  * **Retrieved documents:** Information actively fetched from a knowledge base to inform responses (e.g., pulling technical specifications).  
+  * **Tool outputs:** Results from the AI using an external API for real-time data (e.g., querying a calendar for availability).  
+* **Implicit data:** Critical information such as user identity, interaction history, and environmental state. Incorporating implicit context presents challenges related to privacy and ethical data management. Therefore, robust governance is essential for context engineering, especially in sectors like enterprise, healthcare, and finance.
 
-# --- Parsing and Validation ---
-try:
-    # Use the model_validate_json class method to parse the JSON string.
-    # This single step parses the JSON and validates the data against the User model.
-    user_object = User.model_validate_json(llm_output_json)
+The core principle is that even advanced models underperform with a limited or poorly constructed view of their operational environment. This practice reframes the task from merely answering a question to building a comprehensive operational picture for the agent. For example, a context-engineered agent would integrate a user's calendar availability (tool output), the professional relationship with an email recipient (implicit data), and notes from previous meetings (retrieved documents) before responding to a query. This enables the model to generate highly relevant, personalized, and pragmatically useful outputs. The "engineering" aspect involves creating robust pipelines to fetch and transform this data at runtime and establishing feedback loops to continually improve context quality.
 
-    # Now you can work with a clean, type-safe Python object.
-    print("Successfully created User object!")
-    print(f"Name: {user_object.name}")
-    print(f"Email: {user_object.email}")
-    print(f"Date of Birth: {user_object.date_of_birth}")
-    print(f"First Interest: {user_object.interests[0]}")
+To implement this, specialized tuning systems, such as Google's Vertex AI prompt optimizer, can automate the improvement process at scale. By systematically evaluating responses against sample inputs and predefined metrics, these tools can enhance model performance and adapt prompts and system instructions across different models without extensive manual rewriting. Providing an optimizer with sample prompts, system instructions, and a template allows it to programmatically refine contextual inputs, offering a structured method for implementing the necessary feedback loops for sophisticated Context Engineering.  
+This structured approach differentiates a rudimentary AI tool from a more sophisticated, contextually-aware system. It treats context as a primary component, emphasizing what the agent knows, when it knows it, and how it uses that information. This practice ensures the model has a well-rounded understanding of the user's intent, history, and current environment. Ultimately, Context Engineering is a crucial methodology for transforming stateless chatbots into highly capable, situationally-aware systems.
 
-    # You can access the data like any other Python object attribute.
-    # Pydantic has already converted the 'date_of_birth' string to a datetime.date object.
-    print(f"Type of date_of_birth: {type(user_object.date_of_birth)}")
-except ValidationError as e:
-    # If the JSON is malformed or the data doesn't match the model's types,
-    # Pydantic will raise a ValidationError.
-    print("Failed to validate JSON from LLM.")
-    print(e)
+## Structured Output
+
+Often, the goal of prompting is not just to get a free-form text response, but to extract or generate information in a specific, machine-readable format. Requesting structured output, such as JSON, XML, CSV, or Markdown tables, is a crucial structuring technique. By explicitly asking for the output in a particular format and potentially providing a schema or example of the desired structure, you guide the model to organize its response in a way that can be easily parsed and used by other parts of your agentic system or application. Returning JSON objects for data extraction is beneficial as it forces the model to create a structure and can limit hallucinations. Experimenting with output formats is recommended, especially for non-creative tasks like extracting or categorizing data.
+
+* **Example:**  
+  Extract the following information from the text below and return it as a JSON object with keys `name`, `address`, and `phone.number`.
+
+  Text: "Contact John Smith at 123 Main St, Anytown, CA or call (555) 123-4567."
+
+Effectively utilizing system prompts, role assignments, contextual information, delimiters, and structured output significantly enhances the clarity, control, and utility of interactions with language models, providing a strong foundation for developing reliable agentic systems. Requesting structured output is crucial for creating pipelines where the language model's output serves as the input for subsequent system or processing steps.
+
+**Leveraging Pydantic for an Object-Oriented Facade:** A powerful technique for enforcing structured output and enhancing interoperability is to use the LLM's generated data to populate instances of Pydantic objects. Pydantic is a Python library for data validation and settings management using Python type annotations. By defining a Pydantic model, you create a clear and enforceable schema for your desired data structure. This approach effectively provides an object-oriented facade to the prompt's output, transforming raw text or semi-structured data into validated, type-hinted Python objects.
+
+You can directly parse a JSON string from an LLM into a Pydantic object using the `model.validate.json` method. This is particularly useful as it combines parsing and validation in a single step.
+
 ```
 
 # Техники рассуждения и мыслительного процесса
@@ -141,7 +131,7 @@ except ValidationError as e:
 
 Цикл: Мысль, Действие, Наблюдение, Мысль. Позволяет агенту собирать информацию и адаптировать план.
 
-# Продвинутые техники
+## Продвинутые техники
 
 ### Automatic Prompt Engineering (APE)
 
