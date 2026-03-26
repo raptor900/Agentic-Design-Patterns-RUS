@@ -1,6 +1,7 @@
 # Паттерны проектирования агентных систем (Agentic Design Patterns)
 
 Этот репозиторий содержит полный текст книги «Agentic Design Patterns» авторов Antonio Gulli и Mauro Sauco. Контент был скомпилирован и структурирован Tom Mathews для удобного доступа и использования сообществом.
+На русский язык текст был переведён Юрием Богдановым.
 
 ![Agentic Design Patterns - Book Cover](assets/Agentic_Design_Patterns_Book_Cover.png)
 
@@ -8,6 +9,7 @@
 
 - **Авторы:** [Antonio Gulli](https://www.linkedin.com/in/searchguy/) и [Mauro Sauco](https://www.linkedin.com/in/maurosauco/)
 - **Компиляция:** [Tom Mathews](https://www.linkedin.com/in/mathews-tom/)
+- **Перевод на русский** [Юрий Богданов](https://github.com/raptor900)
 
 ### Чем эта книга выделяется?
 
