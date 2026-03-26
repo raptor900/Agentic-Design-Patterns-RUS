@@ -182,7 +182,7 @@ asyncio.run(main())
 
 Как упоминалось, этот код на Python строит простую агентную систему с использованием LangChain и Google Generative AI. Определяется инструмент `search_information`, имитирующий предоставление фактической информации. Имеет предопределённые ответы и ответ по умолчанию. Инициализируется ChatGoogleGenerativeAI с возможностями вызова инструментов. Создаётся ChatPromptTemplate, затем `create_tool_calling_agent` и AgentExecutor. Запросы проверяют как конкретные, так и ответы по умолчанию.
 
-**CrewAI**
+# Практический пример кода (CrewAI)
 
 ```python
 # pip install crewai langchain-openai
