@@ -1,6 +1,6 @@
 # Глава 19: Оценка и мониторинг
 
-Эта глава рассматривает методологии, позволяющие интеллектуальным агентам систематически оценивать свою производительность, отслеживать прогресс к целям и выявлять операционные аномалии. Хотя Глава 11 описывает постановку целей и мониторинг, а Глава 17 — механизмы рассуждения, эта глава фокусируется на непрерывном, часто внешнем измерении эффективности агента, его соответствия требованиям.
+Эта глава рассматривает методологии, позволяющие агентам систематически оценивать производительность, отслеживать прогресс и выявлять операционные аномалии. Включает определение метрик, установление петель обратной связи и системы отчётности.
 
 ![Мониторинг и оценка производительности агента](../assets/Monitoring_and_Evaluating_Agent_Performance.png)
 
@@ -8,112 +8,256 @@
 
 ## Практические применения и сценарии использования
 
-* **Отслеживание производительности в продакшне:** Непрерывный мониторинг точности, латентности, потребления ресурсов развёрнутого агента.
-* **A/B-тестирование:** Сравнение версий агента для определения оптимальных подходов.
-* **Аудиты соответствия и безопасности:** Автоматические отчёты по соответствию этическим, регуляторным и safety-требованиям.
-* **Enterprise-системы:** AI «Contract» — динамическое соглашение, кодифицирующее цели, правила и контроли для делегированных задач.
-* **Детекция дрейфа:** Отслеживание снижения точности из-за изменений в распределении входных данных.
-* **Детекция аномалий в поведении:** Выявление неожиданных действий агента.
-* **Оценка прогресса обучения:** Кривая обучения, улучшение навыков, генерализация.
+* **Отслеживание в продакшн:** Мониторинг точности, латентности, потребления ресурсов.
+* **A/B-тестирование:** Сравнение версий агента.
+* **Аудиты соответствия:** Автоматические отчёты по соответствию требованиям.
+* **Детекция дрейфа:** Отслеживание снижения точности.
+* **Аномалии в поведении:** Выявление неожиданных действий.
+* **Оценка прогресса обучения:** Кривая обучения, генерализация.
 
 ## Практический пример кода
 
-**Оценка ответов агента:** Ключевой процесс для оценки качества и точности вывода. Метрики: фактическая корректность, беглость, соответствие цели.
+**Оценка ответов агента:** Ключевая точность и релевантность.
 
 ```python
 def evaluate_response_accuracy(agent_output: str, expected_output: str) -> float:
+    """Calculates a simple accuracy score for agent responses."""
+    # This is a very basic exact match; real-world would use more sophisticated metrics
     return 1.0 if agent_output.strip().lower() == expected_output.strip().lower() else 0.0
 
-score = evaluate_response_accuracy("The capital of France is Paris.", "Paris is the capital of France.")
+
+# Example usage
+agent_response = "The capital of France is Paris."
+ground_truth = "Paris is the capital of France."
+score = evaluate_response_accuracy(agent_response, ground_truth)
 print(f"Response accuracy: {score}")
 ```
 
-Проблема: точное сравнение строк не улавливает семантическое сходство. Более эффективные метрики: сходство строк (Levenshtein), семантическое сходство (cosine similarity с эмбеддингами), LLM-as-a-Judge, RAG-метрики (faithfulness, relevance).
+Проблема: точное сравнение строк не улавливает семантическое сходство. Более эффективные метрики: Levenshtein, cosine similarity, LLM-as-a-Judge, RAG-метрики.
 
-**Мониторинг латентности:** Измерение времени отклика. Для production — логирование в persistent storage (JSON, InfluxDB, Prometheus, Datadog).
+**Мониторинг латентности:** Измерение времени отклика. Логирование в persistent storage.
 
-**Отслеживание использования токенов:** Критично для управления стоимостью LLM.
+**Отслеживание токенов:** Критично для управления стоимостью LLM.
 
 ```python
+# This is conceptual as actual token counting depends on the LLM API
 class LLMInteractionMonitor:
     def __init__(self):
         self.total_input_tokens = 0
         self.total_output_tokens = 0
 
     def record_interaction(self, prompt: str, response: str):
-        input_tokens = len(prompt.split())
-        output_tokens = len(response.split())
+        # In a real scenario, use LLM API's token counter or a tokenizer
+        input_tokens = len(prompt.split())  # Placeholder
+        output_tokens = len(response.split())  # Placeholder
         self.total_input_tokens += input_tokens
         self.total_output_tokens += output_tokens
+        print(f"Recorded interaction: Input tokens={input_tokens}, Output tokens={output_tokens}")
+
+    def get_total_tokens(self):
+        return self.total_input_tokens, self.total_output_tokens
+
+
+# Example usage
+monitor = LLMInteractionMonitor()
+monitor.record_interaction("What is the capital of France?", "The capital of France is Paris.")
+monitor.record_interaction("Tell me a joke.", "Why don't scientists trust atoms? Because they make up everything!")
+input_t, output_t = monitor.get_total_tokens()
+print(f"Total input tokens: {input_t}, Total output tokens: {output_t}")
 ```
 
-**LLM-as-a-Judge для «полезности»:** Оценка субъективных качеств через LLM-оценщика. Используя продвинутые лингвистические способности LLM, метод предлагает нюансированные оценки.
+Класс LLMInteractionMonitor отслеживает использование токенов.
+
+**LLM-as-a-Judge для полезности:** Оценка через LLM-оценщика.
 
 ```python
-import os, json, logging
+import os
+import json
+import logging
+from typing import Optional
+
 import google.generativeai as genai
 
+# --- Configuration ---
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Set your API key as an environment variable to run this script
+# For example, in your terminal: export GOOGLE_API_KEY='your_key_here'
+try:
+    genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+except KeyError:
+    logging.error("Error: GOOGLE_API_KEY environment variable not set.")
+    exit(1)
+
+# --- LLM-as-a-Judge Rubric for Legal Survey Quality ---
 LEGAL_SURVEY_RUBRIC = """
-You are an expert legal survey methodologist. Evaluate survey questions on:
-1. Clarity & Precision (1-5)
-2. Neutrality & Bias (1-5)
-3. Relevance & Focus (1-5)
-4. Completeness (1-5)
-5. Appropriateness for Audience (1-5)
-Output JSON: overall_score, rationale, detailed_feedback, concerns, recommended_action.
+ You are an expert legal survey methodologist and a critical legal reviewer. Your task is to evaluate the quality of a given legal survey question. Provide a score from 1 to 5 for overall quality, along with a detailed rationale and specific feedback.
+
+ Focus on the following criteria:
+
+ 1.  **Clarity & Precision (Score 1-5):**
+    * 1: Extremely vague, highly ambiguous, or confusing.
+    * 3: Moderately clear, but could be more precise.
+    * 5: Perfectly clear, unambiguous, and precise in its legal terminology (if applicable) and intent.
+
+ 2.  **Neutrality & Bias (Score 1-5):**
+    * 1: Highly leading or biased, clearly influencing the respondent towards a specific answer.
+    * 3: Slightly suggestive or could be interpreted as leading.
+    * 5: Completely neutral, objective, and free from any leading language or loaded terms.
+
+ 3.  **Relevance & Focus (Score 1-5):**
+    * 1: Irrelevant to the stated survey topic or out of scope.
+    * 3: Loosely related but could be more focused.
+    * 5: Directly relevant to the survey's objectives and well-focused on a single concept.
+
+ 4.  **Completeness (Score 1-5):**
+    * 1: Omits critical information needed to answer accurately or provides insufficient context.
+    * 3: Mostly complete, but minor details are missing.
+    * 5: Provides all necessary context and information for the respondent to answer thoroughly.
+
+ 5.  **Appropriateness for Audience (Score 1-5):**
+    * 1: Uses jargon inaccessible to the target audience or is overly simplistic for experts.
+    * 3: Generally appropriate, but some terms might be challenging or oversimplified.
+    * 5: Perfectly tailored to the assumed legal knowledge and background of the target survey audience.
+
+ **Output Format:**
+ Your response MUST be a JSON object with the following keys:
+ * `overall_score`: An integer from 1 to 5 (average of criterion scores, or your holistic judgment).
+ * `rationale`: A concise summary of why this score was given, highlighting major strengths and weaknesses.
+ * `detailed_feedback`: A bullet-point list detailing feedback for each criterion (Clarity, Neutrality, Relevance, Completeness, Audience Appropriateness). Suggest specific improvements.
+ * `concerns`: A list of any specific legal, ethical, or methodological concerns.
+ * `recommended_action`: A brief recommendation (e.g., "Revise for neutrality", "Approve as is", "Clarify scope").
 """
 
 class LLMJudgeForLegalSurvey:
-    def __init__(self, model_name='gemini-1.5-flash-latest', temperature=0.2):
+    """A class to evaluate legal survey questions using a generative AI model."""
+
+    def __init__(self, model_name: str = 'gemini-1.5-flash-latest', temperature: float = 0.2):
+        """
+        Initializes the LLM Judge.
+
+        Args:
+            model_name (str): The name of the Gemini model to use.
+                              'gemini-1.5-flash-latest' is recommended for speed and cost.
+                              'gemini-1.5-pro-latest' offers the highest quality.
+            temperature (float): The generation temperature. Lower is better for deterministic evaluation.
+        """
         self.model = genai.GenerativeModel(model_name)
         self.temperature = temperature
 
-    def judge_survey_question(self, question: str):
-        prompt = f"{LEGAL_SURVEY_RUBRIC}\n\nQuestion: {question}"
-        response = self.model.generate_content(prompt, generation_config=genai.types.GenerationConfig(temperature=self.temperature, response_mime_type="application/json"))
-        return json.loads(response.text)
+    def _generate_prompt(self, survey_question: str) -> str:
+        """Constructs the full prompt for the LLM judge."""
+        return f"{LEGAL_SURVEY_RUBRIC}\n\n---\n**LEGAL SURVEY QUESTION TO EVALUATE:**\n{survey_question}\n---"
+
+    def judge_survey_question(self, survey_question: str) -> Optional[dict]:
+        """
+        Judges the quality of a single legal survey question using the LLM.
+
+        Args:
+            survey_question (str): The legal survey question to be evaluated.
+
+        Returns:
+            Optional[dict]: A dictionary containing the LLM's judgment, or None if an error occurs.
+        """
+        full_prompt = self._generate_prompt(survey_question)
+
+        try:
+            logging.info(f"Sending request to '{self.model.model_name}' for judgment...")
+            response = self.model.generate_content(
+                full_prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=self.temperature,
+                    response_mime_type="application/json"
+                )
+            )
+
+            # Check for content moderation or other reasons for an empty response.
+            if not response.parts:
+                safety_ratings = response.prompt_feedback.safety_ratings
+                logging.error(f"LLM response was empty or blocked. Safety Ratings: {safety_ratings}")
+                return None
+
+            return json.loads(response.text)
+        except json.JSONDecodeError:
+            logging.error(f"Failed to decode LLM response as JSON. Raw response: {response.text}")
+            return None
+        except Exception as e:
+            logging.error(f"An unexpected error occurred during LLM judgment: {e}")
+            return None
+
+
+# --- Example Usage ---
+if __name__ == "__main__":
+    judge = LLMJudgeForLegalSurvey()
+
+    # --- Good Example ---
+    good_legal_survey_question = """
+    To what extent do you agree or disagree that current intellectual property laws in Switzerland adequately protect emerging AI-generated content, assuming the content meets the originality criteria established by the Federal Supreme Court?
+    (Select one: Strongly Disagree, Disagree, Neutral, Agree, Strongly Agree)
+    """
+    print("\n--- Evaluating Good Legal Survey Question ---")
+    judgment_good = judge.judge_survey_question(good_legal_survey_question)
+    if judgment_good:
+        print(json.dumps(judgment_good, indent=2))
+
+    # --- Biased/Poor Example ---
+    biased_legal_survey_question = """
+    Don't you agree that overly restrictive data privacy laws like the FADP are hindering essential technological innovation and economic growth in Switzerland?
+    (Select one: Yes, No)
+    """
+    print("\n--- Evaluating Biased Legal Survey Question ---")
+    judgment_biased = judge.judge_survey_question(biased_legal_survey_question)
+    if judgment_biased:
+        print(json.dumps(judgment_biased, indent=2))
+
+    # --- Ambiguous/Vague Example ---
+    vague_legal_survey_question = """
+    What are your thoughts on legal tech?
+    """
+    print("\n--- Evaluating Vague Legal Survey Question ---")
+    judgment_vague = judge.judge_survey_question(vague_legal_survey_question)
+    if judgment_vague:
+        print(json.dumps(judgment_vague, indent=2))
 ```
 
-## Траектории агентов
+Класс LLMJudgeForLegalSurvey оценивает юридические вопросы через Gemini.
 
-Оценка траекторий агентов критически важна. Стандартные тесты ПО недостаточны для вероятностных агентов. Нужна качественная оценка как финального вывода, так и последовательности шагов.
+## Оценка траекторий агентов
 
-Методы сравнения: точное совпадение (exact match), совпадение по порядку (in-order), совпадение в любом порядке (any-order), precision, recall.
+Оценка траекторий критически важна. Методы сравнения: exact match, in-order, any-order, precision, recall.
 
-**Файлы оценки:**
-* **Test files (JSON):** Одна сессия, несколько ходов. Идеальны для unit-тестирования.
-* **Evalset files:** Множество сессий с длинными диалогами. Для интеграционных тестов.
+Test files (JSON): одна сессия, unit-тестирование. Evalset files: множественные сессии, интеграционные тесты.
 
-**Многоагентные системы:** Проверка кооперации (передаёт ли Flight-Agent правильные данные Hotel-Agent?), планирования (соблюдает ли порядок?), выбора агента (используется ли правильный для задачи?), масштабируемости (улучшает ли добавление агентов?).
+**Многоагентные системы:** Проверка кооперации, планирования, выбора агента, масштабируемости.
 
-## От агентов к продвинутым контракторам
+## От агентов к контракторам
 
-Предложена эволюция от простых AI-агентов к «контракторам» — детерминированным и подотчётным системам на основе четырёх столпов:
+Эволюция от простых агентов к «контракторам» на основе четырёх столпов:
 
-1. **Формализованный контракт:** Детальная спецификация deliverables, источников данных, области, ожидаемой стоимости и времени.
-2. **Динамический жизненный цикл переговоров:** Контрактор анализирует условия, ведёт диалог, выявляет неоднозначности до начала выполнения.
-3. **Итеративное выполнение с фокусом на качестве:** Self-validation и коррекция. Для генерации кода: несколько подходов, компиляция, unit-тесты, оценка.
-4. **Иерархическая декомпозиция через субконтракты:** Первичный контрактор-менеджер разбивает сложную задачу на субконтракты для специализированных агентов.
+1. **Формализованный контракт:** Детальная спецификация deliverables.
+2. **Переговоры:** Агент анализирует, ведёт диалог.
+3. **Итеративное выполнение:** Self-validation и коррекция.
+4. **Декомпозиция через субконтракты:** Разбиение на подзадачи.
 
-![Пример выполнения контракта между агентами](../assets/Contract_Execution_Example_Among_Agents.png)
+![Контракт между агентами](../assets/Contract_Execution_Example_Among_Agents.png)
 
 Рис. 2: Пример выполнения контракта между агентами
 
 ## Google ADK
 
-Google ADK поддерживает три метода оценки: веб-UI (`adk web`), программная интеграция через pytest, CLI (`adk eval`).
+Google ADK: три метода оценки: веб-UI, pytest, CLI (`adk eval`).
 
-![Поддержка оценки в Google ADK](../assets/Evaluation_Support_for_Google_ADK.png)
+![Поддержка оценки в ADK](../assets/Evaluation_Support_for_Google_ADK.png)
 
 Рис. 3: Поддержка оценки в Google ADK
 
 ## Краткий обзор
 
-**Что:** Агентные системы работают в динамичных средах. Традиционного тестирования ПО недостаточно. Нужны адаптивные методы оценки и метрики.
+**Что:** Агентные системы работают в динамичных средах. Традиционного тестирования недостаточно.
 
-**Почему:** Фреймворк оценки включает метрики точности, латентности, использования токенов, анализ траекторий, LLM-as-a-Judge.
+**Почему:** Фреймворк оценки: метрики точности, латентности, токенов, анализ траекторий, LLM-as-a-Judge.
 
-**Когда использовать:** При развёртывании в продакшн, A/B-тестировании, аудитах соответствия, детекции дрейфа, оценке сложного поведения.
+**Когда использования:** В продакшн, A/B-тестирование, аудиты, дрейф, сложное поведение.
 
 **Визуальное резюме:**
 
@@ -123,20 +267,20 @@ Google ADK поддерживает три метода оценки: веб-UI 
 
 ## Ключевые выводы
 
-* Оценка агентов выходит за рамки простых тестов к непрепывной многофакторной оценке.
-* Практические применения: мониторинг в продакшн, A/B, аудиты, детекция дрейфа.
-* Траектории агентов — критический элемент оценки.
-* ADK: test files (unit) и evalset files (integration), три метода запуска.
-* «Контракторы» — эволюция агентов с формальными соглашениями, переговорами, self-validation и декомпозицией.
+* Оценка — непрерывная многофакторная оценка.
+* Применения: мониторинг, A/B, аудиты, дрейф.
+* Траектории — критический элемент.
+* ADK: test files и evalset files.
+* Контракторы — формальные соглашения с верификацией.
 
 ## Заключение
 
-Эффективная оценка AI-агентов требует многофакторного подхода: мониторинга латентности и токенов, анализа траекторий, LLM-as-a-Judge. Для production-агентов парадигма смещается к формальным «контрактам» с верифицируемыми deliverables. Это превращает агентов из непредсказуемых инструментов в подотчётные системы.
+Эффективная оценка: мониторинг латентности, анализ траекторий, LLM-as-a-Judge. Контракторы — формальные deliverables. Агенты из непредсказуемых инструментов в подотчётные системы.
 
 ## Ссылки
 
 1. ADK Web: [https://github.com/google/adk-web](https://github.com/google/adk-web)
 2. ADK Evaluate: [https://google.github.io/adk-docs/evaluate/](https://google.github.io/adk-docs/evaluate/)
-3. Survey on Evaluation of LLM-based Agents: [https://arxiv.org/abs/2503.16416](https://arxiv.org/abs/2503.16416)
+3. Survey on LLM Evaluation: [https://arxiv.org/abs/2503.16416](https://arxiv.org/abs/2503.16416)
 4. Agent-as-a-Judge: [https://arxiv.org/abs/2410.10934](https://arxiv.org/abs/2410.10934)
 5. Agent Companion: [https://www.kaggle.com/whitepaper-agent-companion](https://www.kaggle.com/whitepaper-agent-companion)
